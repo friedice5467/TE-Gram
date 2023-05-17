@@ -1,5 +1,38 @@
-# Final Capstone
+# TE Gram
 
-This directory contains all of the starter projects for the final capstone. The Vue starter project works with both the Java and .NET backend projects with a single configuration update that you can read about in the README.
+TE Gram is a social media platform inspired by Instagram with a unique twist. It allows users to share their photos, connect with others, and explore a visually appealing feed. This repository contains the source code and documentation for TE Gram.
 
-Each project contains instructions that provides information about the starting code and explains how to get started with the final capstone project.
+## Features
+
+- User authentication and account management
+- Upload and share photos
+- Explore a feed of photos from other users
+- Like and comment on photos
+- Customize account details, including profile picture and bio
+- Dark and light mode with customizable accent color
+
+## Installation
+
+To run TE Gram locally, follow these steps:
+
+1. Clone this repository: `git clone [repository-url]`
+2. Navigate to the project directory: `cd TE-Gram`
+3. Install the dependencies: `npm install`
+4. Start the application: `npm start`
+5. Open your web browser and visit: `http://localhost:3000`
+
+For detailed API documentation, refer to the [API Documentation](api-documentation.md) file.
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgements
+
+We would like to thank Angeline for her contribution in creating the initial layout design for TE Gram.
+
+
