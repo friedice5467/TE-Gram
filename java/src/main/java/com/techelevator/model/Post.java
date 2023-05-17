@@ -14,13 +14,14 @@ public class Post {
     private LocalDateTime postDate;
     private boolean privated;
     private List<Comment> comments;
-    private boolean liked;
-    private boolean favorited;
     private int likesCount;
+    private boolean isLiked;
+    private boolean isFavorited;
 
-    public Post(){}
+    public Post() {
+    }
 
-    public Post(int postId, int accountId, String img, String caption, LocalDateTime postDate, boolean privated, List<Comment> comments, boolean liked, boolean favorited, int likesCount) {
+    public Post(int postId, int accountId, String img, String caption, LocalDateTime postDate, boolean privated, List<Comment> comments, int likesCount, boolean isLiked, boolean isFavorited) {
         this.postId = postId;
         this.accountId = accountId;
         this.img = img;
@@ -28,10 +29,13 @@ public class Post {
         this.postDate = postDate;
         this.privated = privated;
         this.comments = comments;
-        this.liked = liked;
-        this.favorited = favorited;
         this.likesCount = likesCount;
+        this.isLiked = isLiked;
+        this.isFavorited = isFavorited;
     }
+
+
+    //overloaded constructor without comments/liked/favorited/likescount? to allow add post method to work
 
     public int getPostId() {
         return postId;
@@ -69,7 +73,6 @@ public class Post {
         return postDate;
     }
 
-//    commenting this out for now to run front-end :)
     public void setPostDate(LocalDateTime postDate) {
         this.postDate = postDate;
     }
@@ -90,27 +93,27 @@ public class Post {
         this.comments = comments;
     }
 
-    public boolean isLiked() {
-        return liked;
-    }
-
-    public void setLiked(boolean liked) {
-        this.liked = liked;
-    }
-
-    public boolean isFavorited() {
-        return favorited;
-    }
-
-    public void setFavorited(boolean favorited) {
-        this.favorited = favorited;
-    }
-
     public int getLikesCount() {
         return likesCount;
     }
 
     public void setLikesCount(int likesCount) {
         this.likesCount = likesCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public boolean isFavorited() {
+        return isFavorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        isFavorited = favorited;
     }
 }

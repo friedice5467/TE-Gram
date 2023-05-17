@@ -20,15 +20,10 @@ export default new Vuex.Store({
   state: {
     token: currentToken || '',
     user: currentUser || {},
-    images: [
-      "https://i.picsum.photos/id/397/200/300.jpg?hmac=9VBInLrifj_yyc2JuJSAVIfj9yQdt5Ovm2sHmvva-48",
-      "https://www.gstatic.com/webp/gallery3/1.png",
-      "https://www.gstatic.com/webp/gallery3/1.png",
-      "https://www.gstatic.com/webp/gallery3/1.png",
-      "https://www.gstatic.com/webp/gallery3/1.png",
-      "https://www.gstatic.com/webp/gallery3/1.png",
-      "https://www.gstatic.com/webp/gallery3/1.png"
-    ]
+    posts: [],
+    account: {},
+    currentAccount: {},
+    currentView: ''
   },
   mutations: {
     SET_AUTH_TOKEN(state, token) {
@@ -46,6 +41,39 @@ export default new Vuex.Store({
       state.token = '';
       state.user = {};
       axios.defaults.headers.common = {};
+    },
+    ADD_POST(state, post) {
+      state.posts.unshift(post)
+    },
+    INITIALIZE_POSTS(state, posts) {
+      state.posts = posts
+    },
+    TOGGLE_LIKE(state, postId) {
+      state.posts.forEach(post => {
+        if (post.postId == postId){
+           post.liked = !post.liked
+           if (post.liked){post.likesCount++
+          } else {
+          post.likesCount--
+        }
+        }
+      })
+    },
+    TOGGLE_FAVORITE(state, postId) {
+      state.posts.forEach(post => {
+        if (post.postId == postId){
+           post.favorited = !post.favorited
+        }
+      })
+    },
+    SET_ACCOUNT(state, newAccount) {
+      state.account = newAccount;
+    },
+    SET_CURRENT_ACCOUNT(state, newCurrentAccount) {
+      state.currentAccount = newCurrentAccount;
+    },
+    CHANGE_CURRENT_VIEW(state, view) {
+      state.currentView = view
     }
   }
 })

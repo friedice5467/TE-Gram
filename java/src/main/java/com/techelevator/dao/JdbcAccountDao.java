@@ -16,15 +16,28 @@ public class JdbcAccountDao implements AccountDao{
 
     @Override
     public void createAccount(long userId, String username) {
-        String sql = "INSERT INTO accounts (user_id, display_name) VALUES(?, ?)";
-        jdbcTemplate.update(sql, userId, username);
+        String defaultProfilePic = "https://i.picsum.photos/id/326/200/200.jpg?hmac=T_9V3kc7xrK46bj8WndwDhPuvpbjnAM3wfL_I7Gu6yA";
+        String sql = "INSERT INTO accounts (user_id, display_name, profile_img) VALUES(?, ?, ?)";
+        jdbcTemplate.update(sql, userId, username, defaultProfilePic);
     }
 
     @Override
-    public Account getAccount(long userId) {
+    public Account getAccountByUserId(long userId) {
         Account account = new Account();
         String sql = "SELECT account_id, user_id, profile_img, display_name, biography FROM accounts WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
+
+        if(results.next()){
+            account = MapRowToAccount(results);}
+
+        return account;
+    }
+
+    @Override
+    public Account getAccountByAccountId(long accountId) {
+        Account account = new Account();
+        String sql = "SELECT account_id, user_id, profile_img, display_name, biography FROM accounts WHERE account_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
 
         if(results.next()){
             account = MapRowToAccount(results);}
@@ -41,8 +54,8 @@ public class JdbcAccountDao implements AccountDao{
     private Account MapRowToAccount(SqlRowSet results){
         Account account = new Account();
 
-        account.setAccountID(results.getInt("account_id"));
-        account.setUserID(results.getInt("user_id"));
+        account.setAccountId(results.getInt("account_id"));
+        account.setUserId(results.getInt("user_id"));
         account.setDisplayName(results.getString("display_name"));
         account.setBiography(results.getString("biography"));
         account.setProfileImg(results.getString("profile_img"));

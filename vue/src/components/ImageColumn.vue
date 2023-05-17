@@ -1,73 +1,117 @@
 <template>
-  <div class="my-images" > 
-    <!-- <div class='indiv-image' v-for="image in images" v-bind:key="image.id"> -->
-      <img class="image" v-for="image in images" v-bind:key="image.id" v-bind:src="image" alt="" />
-      <!-- <div class='image-info'>
-        <p>username</p>
-        <p>caption<br>caption<br>caption<br>caption<br></p>
-      </div> -->
+  <div class="my-images">
+    <div
+      class="feed-post-container"
+      v-for="(post, index) in filterPosts(this.$store.state.posts)"
+      :key="index"
+      v-bind:postId="post.postId"
+    >
+      <post-header v-bind:accountId="post.accountId"/>
+      <img class="image" v-bind:src="post.img" alt="" />
+      <post-interaction v-bind:post="post" />
     </div>
-  <!-- </div> -->
+
+    <div
+      v-if="this.$store.state.currentView == 'profile'"
+      id="profile-add-new-post feed-post-container"
+    >
+    </div>
+  </div>
 </template>
 
 <script>
+import PostInteraction from './PostInteraction.vue';
+import PostHeader from './PostHeader.vue';
+import PostService from '../services/PostService';
+import AccountService from '../services/AccountService';
+
 export default {
-  name: 'image-column',
-  computed: {
-    images() {
-      return this.$store.state.images;
+  components: { PostInteraction, PostHeader },
+  name: "image-column",
+  methods: {
+    filterPosts(posts) {
+      return posts.filter((post) => {
+        if (post.img.includes("cloudinary")) return post;
+      });
     },
-  }
-};
+  },
+  computed: {},
+  created() {
+    if(this.$route.params.id != undefined){
+         PostService.getAccountPosts(this.$route.params.id).then((response) =>
+        this.$store.commit("INITIALIZE_POSTS", response.data))
+        AccountService.getAccountOther(this.$route.params.id).then((response) => 
+        this.$store.commit("SET_ACCOUNT", response.data))
+    } else {
+      PostService.getAllPosts().then((response) => {
+      this.$store.commit("INITIALIZE_POSTS", response.data)
+      AccountService.getAccountSelf().then((response) => {
+      this.$store.commit("SET_CURRENT_ACCOUNT", response.data);
+ });
+    
+    });
+    }
+     
+}}
+
 </script>
 
 <style>
+@media (max-width: 10000px) {
   .my-images {
-    margin-left: 295px;
     line-height: 0;
-    
+    height: calc(100%);
+
     -webkit-column-count: 3;
-    -webkit-column-gap:   0px;
-    -moz-column-count:    3;
-    -moz-column-gap:      0px;
-    column-count:         3;
-    column-gap:           0px;  
-    background: var(--primary-background-color);
+    -webkit-column-gap: 0px;
+    -moz-column-count: 3;
+    -moz-column-gap: 0px;
+    column-count: 3;
+    column-gap: 10px;
+    /* background: var(--primary-background-color);s */
   }
+}
 
-  .my-images .image {
-    /* margin: 20px; */
-    margin-left: 0px;
-    margin-right: 0px;
-    width: calc(100% - 40px)!important;
-    height: auto !important;
-    /* border: 0px solid grey; */
-    box-shadow: 0px 0px 5px rgb(172, 169, 169);
-    border-radius: 5%;
-    
-    margin-top: 5px;
-    margin-bottom: 5px;
-    border-top: 0px
+@media only screen and (max-width: 1400px) {
+  .my-images {
+    line-height: 0;
+    height: calc(100%);
+
+    -webkit-column-count: 2;
+    -webkit-column-gap: 0px;
+    -moz-column-count: 2;
+    -moz-column-gap: 0px;
+    column-count: 2;
+    column-gap: 10px;
+    /* background: var(--primary-background-color); */
+
+    display: block;
+
+    break-inside: avoid;
   }
+}
 
-  /* .my-images
-  {
+@media only screen and (max-width: 900px) {
+  .my-images {
     display: flex;
-    flex-direction: row;
-    
-    flex-wrap: wrap;
-    align-items: center;
-    background-color: grey;
-  } */
- 
-  .image-info {
-    border-left: solid black 3px;
-    /* max-width: 20%; */
-    color: black;
-    padding-left: 5px
+    flex-direction: column;
+
+    /* background: var(--primary-background-color); */
   }
-  .image {
-    /* margin: 20px; */
-    /* max-width: calc(60%); */
-  }
+}
+
+.my-images .feed-post-container {
+  box-shadow: 0px 0px 5px rgb(172, 169, 169);
+  border-radius: 5%;
+  border-top: 0px;
+  display: block;
+
+  break-inside: avoid;
+}
+
+.my-images .feed-post-container .image {
+  width: calc(100% - 10px) !important;
+  border: 5px var(--panel-background-color) solid;
+  border-radius: 5px 5px 0px 0px;
+}
 </style>

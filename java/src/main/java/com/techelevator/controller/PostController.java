@@ -21,38 +21,41 @@ public class PostController {
     private AccountDao accountDao;
     private CommentDao commentDao;
     private LikedDao likedDao;
-
+    private FavoritedDao favoritedDao;
     @Autowired
-    public PostController(PostDao postDao, UserDao userDao, AccountDao accountDao, CommentDao commentDao, LikedDao likedDao){
+    public PostController(PostDao postDao, UserDao userDao, AccountDao accountDao, CommentDao commentDao, LikedDao likedDao, FavoritedDao favoritedDao){
         this.postDao = postDao;
         this.userDao = userDao;
         this.accountDao = accountDao;
         this.commentDao = commentDao;
         this.likedDao = likedDao;
+        this.favoritedDao = favoritedDao;
     }
 
     @RequestMapping(path="/posts")
     public List<Post> listPosts(Principal principal){
         long userId = userDao.findIdByUsername(principal.getName());
-        int accountId = accountDao.getAccount(userId).getAccountID();
+        int accountId = accountDao.getAccountByUserId(userId).getAccountId();
         List<Post> postList = postDao.getAllPost();
         for(Post post : postList){
             post.setComments(commentDao.listComments(post.getPostId()));
-            post.setLiked(likedDao.isLiked(post.getPostId(), accountId));
             post.setLikesCount(likedDao.getNumLikes(post.getPostId()));
+            post.setLiked(likedDao.isLiked(post.getPostId(), accountId));
+            post.setFavorited(favoritedDao.isFavorited(post.getPostId(), accountId));
         }
         return postList;
     }
 
-    @RequestMapping(path="/posts/{otherId}")
+    @RequestMapping(path="/{otherId}/posts")
     public List<Post> listAccountPosts(@PathVariable int otherId, Principal principal){
         long userId = userDao.findIdByUsername(principal.getName());
-        int accountId = accountDao.getAccount(userId).getAccountID();
+        int accountId = accountDao.getAccountByUserId(userId).getAccountId();
         List<Post> postList = postDao.getPostsByAccountId(otherId);
         for(Post post : postList){
             post.setComments(commentDao.listComments(post.getPostId()));
-            post.setLiked(likedDao.isLiked(post.getPostId(), accountId));
             post.setLikesCount(likedDao.getNumLikes(post.getPostId()));
+            post.setLiked(likedDao.isLiked(post.getPostId(), accountId));
+            post.setFavorited(favoritedDao.isFavorited(post.getPostId(), accountId));
         }
         return postList;
     }
@@ -60,11 +63,12 @@ public class PostController {
     @RequestMapping(path="/post/{postId}")
     public Post getPost(@PathVariable int postId, Principal principal){
         long userId = userDao.findIdByUsername(principal.getName());
-        int accountId = accountDao.getAccount(userId).getAccountID();
+        int accountId = accountDao.getAccountByUserId(userId).getAccountId();
         Post post = postDao.getPost(postId);
         post.setComments(commentDao.listComments(post.getPostId()));
-        post.setLiked(likedDao.isLiked(postId, accountId));
         post.setLikesCount(likedDao.getNumLikes(postId));
+        post.setLiked(likedDao.isLiked(post.getPostId(), accountId));
+        post.setFavorited(favoritedDao.isFavorited(post.getPostId(), accountId));
         return post;
     }
 
@@ -72,7 +76,7 @@ public class PostController {
     @PostMapping(path="/post")
     public void addPost(@Valid @RequestBody Post post, Principal principal){
         long userId = userDao.findIdByUsername(principal.getName());
-        int accountId = accountDao.getAccount(userId).getAccountID();
+        int accountId = accountDao.getAccountByUserId(userId).getAccountId();
 
         post.setAccountId(accountId);
         post.setPostDate(LocalDateTime.now());
@@ -85,7 +89,7 @@ public class PostController {
     public void deletePost(@PathVariable int id, Principal principal){
         long userId = userDao.findIdByUsername(principal.getName());
         User user = userDao.getUserById(userId);
-        int accountId = accountDao.getAccount(userId).getAccountID();
+        int accountId = accountDao.getAccountByUserId(userId).getAccountId();
 
         Post post = postDao.getPost(id);
 

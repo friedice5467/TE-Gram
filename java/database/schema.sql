@@ -21,7 +21,7 @@ CREATE TABLE users (
 
 CREATE TABLE accounts (
 	account_id serial,
-	profile_img varchar(100),
+	profile_img varchar(500),
 	user_id int NOT NULL,
 	display_name varchar(30),
 	biography varchar (300),
@@ -47,14 +47,16 @@ CREATE TABLE likes(
 	account_id int NOT NULL,
 	post_id int NOT NULL,
 	CONSTRAINT FK_account FOREIGN KEY (account_id) REFERENCES accounts(account_id),
-	CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES posts(post_id)
+	CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES posts(post_id),
+	CONSTRAINT PK_like_post_account PRIMARY KEY (account_id, post_id)
 );
 
 CREATE TABLE favorites(
 	account_id int NOT NULL,
 	post_id int NOT NULL,
 	CONSTRAINT FK_account FOREIGN KEY (account_id) REFERENCES accounts(account_id),
-	CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES posts(post_id)
+	CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES posts(post_id),
+	CONSTRAINT PK_favorite_post_account PRIMARY KEY (account_id, post_id)
 );
 
 CREATE TABLE comments (

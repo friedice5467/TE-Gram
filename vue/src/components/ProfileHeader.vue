@@ -1,88 +1,15 @@
 <template>
-  <div class="side-bar">
-    <div id="nav-user" @click="routeToProfile">
-      <img src="@/assets/icons8-settings-50.png" alt="" class="settings-icon" />
-      <img
-        :src="this.$store.state.currentAccount.profileImg"
-        alt="@/assets/default-user-image.png"
-        id="profile-icon"
-      />
-    </div>
-
-    <p class="display-name">{{ getDisplayName }}</p>
-    <!-- <div id="user-stats">
-      <ul>
-        <li>
-          10 <br />
-          posts
-        </li>
-        <li>
-          22 <br />
-          followers
-        </li>
-        <li>
-          25 <br />
-          likes
-        </li>
-      </ul>
-    </div> -->
-
-    <div v-if="creatingPost === true" id="upload">
-      <button
-        id="upload_widget"
-        class="cloudinary-button"
-        @click.prevent="uploadPhoto"
-      >
-        Upload Image
-      </button>
-      <div class="uploaded-photo-diplay">
-        <p v-if="!imageUrl.includes('$$$$$$')">Successfully Uploaded</p>
-      </div>
-      <form id="upload-form">
-        <textarea
-          name=""
-          id="upload-caption-input"
-          cols="30"
-          rows="4"
-          placeholder="Enter caption"
-          v-model="post.caption"
-        ></textarea>
-        <!-- <div id="privated">
-          <input
-            id="upload-checkbox-private"
-            type="checkbox"
-            v-model="post.privated"
-          /> -->
-        <!-- <label for="upload-checkbox-private">Private {{ privated }}</label> -->
-        <!-- </div> -->
-        <div id="form-submit-buttons">
-          <button id="cancel-upload" @click.prevent="toggleCreatingPost">
-            Cancel
-          </button>
-          <button id="submit-upload" @click="uploadPost" type="submit">
-            Post
-          </button>
-        </div>
-      </form>
-    </div>
+  <div class="profile-header">
     <div class="nav-list">
-      <div class="nav-link" id="make-a-post-link" v-if="creatingPost === false">
+      <div class="nav-link" id="home-link" @click="routeToHome">
         <img
           class="nav-bar-icon"
-          src="@/assets/add_photo_alternate_FILL0_wght400_GRAD0_opsz48.png"
+          src="@/assets/home_FILL0_wght400_GRAD0_opsz48.png"
           alt=""
         />
-        <p @click="toggleCreatingPost" class="nav-text">create a post</p>
+        <p class="nav-text">home</p>
       </div>
 
-      <!-- <div class="nav-link" id="posts-link">
-        <img
-          class="nav-bar-icon"
-          src="@/assets/photo_library_FILL0_wght400_GRAD0_opsz48.png"
-          alt=""
-        />
-        <p class="nav-text">posts</p>
-      </div> -->
       <div class="nav-link" id="favorited-link">
         <img
           class="nav-bar-icon"
@@ -91,6 +18,7 @@
         />
         <p class="nav-text">favorited</p>
       </div>
+
       <div class="nav-link" id="likes-link">
         <img
           class="nav-bar-icon"
@@ -99,6 +27,13 @@
         />
         <p class="nav-text">likes</p>
       </div>
+    </div>
+
+    <div id="nav-user" @click="uploadPFP">
+      <img :src="getProfilePic" alt="" id="profile-icon" />
+    </div>
+
+    <div class="nav-list">
       <div class="nav-link" id="people-i-follow-link">
         <img
           class="nav-bar-icon"
@@ -129,10 +64,11 @@
 
 <script>
 import postService from "../services/PostService";
-import accountService from "../services/AccountService.js";
+
+import accountService from "../services/AccountService";
 
 export default {
-  name: "side-bar",
+  name: "profile-header",
   components: {},
   data() {
     return {
@@ -141,69 +77,25 @@ export default {
         img: "",
         privated: false,
       },
-      imageUrl: "$$$$$$",
+      imageUrl: "No image currently selected",
       preview: true,
       creatingPost: false,
-      displayName: "",
     };
   },
   methods: {
-    routeToProfile() {
-      accountService.getAccountSelf().then((response) => {
-        this.$store.commit("SET_ACCOUNT", response.data);
-        this.$router.push(`/profile/${this.$store.state.account.accountId}`);
-      });
-    },
     logout() {
       this.$store.commit("LOGOUT");
       this.$router.push("/login");
     },
+    routeToHome() {
+      this.$router.push("/");
+    },
     toggleCreatingPost() {
       this.creatingPost = !this.creatingPost;
     },
-
-    createTempPost(post) {
-      let today = new Date();
-      let dd = String(today.getDate()).padStart(2, "0");
-      let mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-      let hours = String(today.getHours()).padStart(2, "0");
-      let minutes = String(today.getMinutes()).padStart(2, "0");
-      let seconds = String(today.getSeconds()).padStart(2, "0");
-      let milliseconds = String(today.getMilliseconds()).padStart(6, "0");
-      let yyyy = today.getFullYear();
-
-      let currentDate =
-        yyyy +
-        "-" +
-        mm +
-        "-" +
-        dd +
-        "t" +
-        hours +
-        ":" +
-        minutes +
-        ":" +
-        seconds +
-        "." +
-        milliseconds;
-      console.log(this.$store.state.currentAccount);
-      return {
-        accountId: this.$store.state.currentAccount.accountId,
-        caption: post.caption,
-        comments: [],
-        img: post.img,
-        likesCount: 0,
-        postDate: currentDate,
-        postId: this.$store.state.posts.length + 1,
-        privated: "false",
-        liked: false,
-      };
-    },
-
     uploadPost() {
       postService.addPost(this.post).then((response) => {
         if (response.status == 201 || response.status == 200) {
-          this.$store.commit("ADD_POST", this.createTempPost(this.post));
           this.imageUrl = "";
           this.post.caption = "";
           this.post.img = "";
@@ -214,7 +106,6 @@ export default {
         this.creatingPost = !this.creatingPost;
       });
     },
-
     uploadPhoto() {
       window.cloudinary
         .openUploadWidget(
@@ -235,6 +126,42 @@ export default {
         )
         .open();
     },
+    uploadPFP() {
+      window.cloudinary
+        .openUploadWidget(
+          {
+            cloud_name: "dcipg5scy",
+            upload_preset: "TE-GRAM",
+            maxFiles: 1,
+          },
+          (error, result) => {
+            //add verify clause for correct user
+            if (!error && result && result.event === "success") {
+              console.log(result.info.url);
+
+              accountService
+                .updateAccount({
+                  accountId: this.$store.state.currentAccount.accountId,
+                  userId: this.$store.state.currentAccount.userId,
+                  displayName: this.$store.state.currentAccount.displayName,
+                  profileImg: result.info.url,
+                })
+                .then((response) => {
+                  console.log(response.status);
+                  this.$store.commit("SET_CURRENT_ACCOUNT", {
+                    accountId: this.$store.state.currentAccount.accountId,
+                    userId: this.$store.state.currentAccount.userId,
+                    displayName: this.$store.state.currentAccount.displayName,
+                    profileImg: result.info.url,
+                  });
+                });
+            } else {
+              console.log(error);
+            }
+          }
+        )
+        .open();
+    },
   },
   computed: {
     getPosts() {
@@ -244,12 +171,6 @@ export default {
       console.log(this.$store.state.currentAccount.profileImg);
       return this.$store.state.currentAccount.profileImg;
     },
-    getDisplayName() {
-      return this.$store.state.currentAccount.displayName;
-    },
-  },
-  created() {
-    this.displayName = this.$store.state.currentAccount.displayName;
   },
 };
 </script>
@@ -257,20 +178,17 @@ export default {
 <style lang="css" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
 
-.make-a-post-link p {
-  margin: 6px;
-}
-
-.side-bar {
+.profile-header {
   display: flex;
   width: 100%;
-  flex-direction: column;
-  background-color: var(--panel-background-color);
+  flex-direction: row;
+  background-color: white;
   align-items: center;
   font-family: "Open Sans", sans-serif;
   box-shadow: 0px 2px 10px rgb(184, 184, 184);
+  justify-content: space-evenly;
+  height: 100px;
 }
-
 #nav-user {
   display: flex;
   flex-direction: row;
@@ -286,15 +204,11 @@ export default {
 }
 
 #profile-icon {
-  margin-top: 35px;
+  margin-top: 45px;
   max-width: 150px;
   padding: 0px;
   box-shadow: 1px 1px 25px var(--primary-background-color);
   border-radius: 100%;
-}
-
-.display-name {
-  color: black;
 }
 
 #user-stats {
@@ -304,7 +218,7 @@ export default {
 }
 
 ul {
-  /* margin-top: 10px; */
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -322,8 +236,8 @@ li {
 .nav-list {
   margin-right: 60px;
   display: flex;
-  flex-direction: column;
-  justify-content: space-bet;
+  flex-direction: row;
+  justify-content: space-evenly;
   flex-grow: 1;
 }
 
@@ -375,13 +289,12 @@ li {
   margin-top: 30px;
   width: 275px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
 
-.uploaded-photo-diplay {
-  color: black;
+#upload-form {
 }
 
 #upload-widget {
