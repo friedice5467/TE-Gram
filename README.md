@@ -1,6 +1,6 @@
 # TE Gram
 
-TE Gram is a social media platform inspired by Instagram with a unique twist. It allows users to share their photos, connect with others, and explore a visually appealing feed. This repository contains the source code and documentation for TE Gram.
+TE Gram is a social media platform inspired by Instagram. It allows users to share their photos, connect with others, and explore a visually appealing feed. This repository contains the source code and documentation for TE Gram.
 
 ## Features
 
